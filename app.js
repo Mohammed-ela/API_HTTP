@@ -12,10 +12,12 @@ app.get('/', (req, res) => {
 const abonnements = require("./routes/abonnements");
 const actualites = require("./routes/actualites");
 const userRoutes = require("./routes/user");
+const contactRoutes = require("./routes/contact");
 
 app.use("/abonnements", abonnements);
 app.use("/actualites", actualites);
 app.use("/users", userRoutes);
+app.use('/contact', contactRoutes);
 
 app.listen(port, () => {
     console.log(`Serveur en ligne sur le port : ${port}`);
