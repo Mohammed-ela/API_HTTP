@@ -555,4 +555,5 @@ FodyWeavers.xsd
 
 # End of https://www.toptal.com/developers/gitignore/api/node,visualstudio,visualstudiocode
 # Ignore data file
-data/abonnements.json
+data/*
+prisma/*
