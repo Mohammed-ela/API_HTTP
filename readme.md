@@ -1,17 +1,22 @@
 
-# Projet API Abonnements
+# Projet API HTTP
 
-Ce projet est une API simple pour gérer des abonnements, construite avec Node.js et Express. Les données des abonnements sont stockées dans une BDD SQL.
+Ce projet est une API simple pour gérer des abonnements, construite avec Node.js et Express. Les données des abonnements sont stockées dans une BDD MYSQL.
 
 ## Structure du Projet
 
 ```
 project-root/
 ├── app.js
+├── controllers/
+│   └── abonnementsController.js
+├── models/
+│   └── abonnement.js
 ├── routes/
 │   └── abonnements.js
 └── data/
     └── abonnements.json
+
 ```
 
 ## Prérequis
@@ -115,6 +120,23 @@ Le serveur devrait maintenant être en ligne sur `http://localhost:5000`.
           }
     }
   ```
+
+### Gestion des users
+
+- **URL** : `/users`
+- **Méthode** : `POST`
+- **Description** :
+- **Exemple de réponse** :
+  EN COURS
+
+
+### Page static GET (cgu cgv etc)
+
+- **URL** : `/actualite`
+- **Méthode** : `GET`
+- **Description** :
+- **Exemple de réponse** :
+  EN COURS
 
 ## Fichiers Importants
 

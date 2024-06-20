@@ -557,3 +557,4 @@ FodyWeavers.xsd
 # Ignore data file
 data/*
 prisma/*
+seed.js

@@ -7,7 +7,9 @@ const {
     signupResponse,
     signinResponse,
     recoveryResponse,
+    newPasswordResponse,
     extractUserInfo
+
 } = require('../controllers/UserControllers.js');
 
 // Création du routeur
@@ -20,6 +22,7 @@ router.route('/connexion')
         checkAuthPayload,
         //check email
         checkEmailPayload,
+        //le login
         signinResponse
     );
 
@@ -30,20 +33,22 @@ router.route('/inscription')
         checkEmailPayload,
         //check password
         checkPasswordPayload,
+        //la connexion
         signupResponse
 
     );
   // ----------------------------------------------------------------Recovery Password
   router.route('/recovery-password/')
         .post(
+            //check email
             checkEmailPayload,
-            recoveryResponse,
-            (req, res) => {
-                //logique
-      
-              }
+            recoveryResponse
         );
-    
+// ----------------------- update password link
+        router.route('/new-password/:slug')
+        .post(
+            newPasswordResponse
+        );
     
     
     
@@ -51,11 +56,7 @@ router.route('/inscription')
     // ----------------------------------------------------------------User Info
   router.route('/user/:id')
         .get(
-            extractUserInfo,
-            (req, res) => {
-                //logique
-      
-              }
+            extractUserInfo
         );
 
 
