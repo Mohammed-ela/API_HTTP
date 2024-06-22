@@ -255,25 +255,43 @@ module.exports = {
             return res.status(500).json({ message: 'Erreur lors de la mise à jour du mot de passe.', error });
         }
     },
-    extractUserInfo: async (req, res, next) => {
+    // middleware d'authentification
+    isconnected: async (req, res, next) => {
         try {
             const authorizationHeader = req.headers.authorization;
             
             if (!authorizationHeader) {
-                return res.status(401).json({ message: 'Token manquant dans le HEADER, veuillez vous connecter' });
+                return res.status(401).json({ message: 'pas de token ? => isconnected' });
             }
             
             const token = authorizationHeader.replace('Bearer ', '');
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             
-            req.user = await prisma.user.findUnique({ where: { id: decoded.userId } });
-            if (!req.user) {
-                return res.status(401).json({ message: 'Token invalide' });
-            }
+            req.user = { id: decoded.userId };
             
             next();
         } catch (error) {
-            return res.status(401).json({ message: 'Token invalide', error });
+            res.status(401).json({ message: 'vous etes pas connecte => isconnected', error });
+        }
+    },
+    // faire une recherche d'user grace a l'id recuperer
+    extractUserInfo: async (req, res, next) => {
+        try {
+            req.user = await prisma.user.findUnique({ where: { id: req.user.id } });
+            if (!req.user) {
+                return res.status(404).json({ message: 'Utilisateur non trouvé' });
+            }
+            next();
+        } catch (error) {
+            res.status(500).json({ message: 'Erreur recherche user =>  extractUserInfo', error });
+        }
+    },
+    // afficher info user
+    getUserInfo: async (req, res) => {
+        try {
+            res.status(200).json(req.user);
+        } catch (error) {
+            res.status(500).json({ message: 'Erreur lors de lenvois information user =>  getUserInfo', error });
         }
     }
     

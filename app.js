@@ -1,10 +1,17 @@
 // app.js
 const express = require("express");
 const port = process.env.PORT || 5000;
+const helmet = require("helmet");
+const cors = require("cors");
+
 
 const app = express();
+// requete en json (alternatiev to bodyparser)
 app.use(express.json());
-
+// securité helmet du header
+app.use(helmet());
+// cors pour api fonctionne avec des domaines differents
+app.use(cors());
 app.get('/', (req, res) => {
     res.json({message:"Bienvenue sur l'API en NodeJS"});
 });

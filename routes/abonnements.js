@@ -17,6 +17,7 @@ const router = express.Router();
         .get(
             getAbonnement
         )
+        //stripe
         .post(
             subscription
         );

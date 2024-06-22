@@ -8,7 +8,9 @@ const {
     signinResponse,
     recoveryResponse,
     newPasswordResponse,
-    extractUserInfo
+    isconnected,
+    extractUserInfo,
+    getUserInfo
 
 } = require('../controllers/UserControllers.js');
 
@@ -54,10 +56,15 @@ router.route('/inscription')
     
                                     //------------------------------------------Si CONNECTE-----------------------------------------------------------------------//
     // ----------------------------------------------------------------User Info
-  router.route('/user/:id')
-        .get(
-            extractUserInfo
-        );
+    router.route('/profile')
+    .get(
+        // middleware si on est connecté ? + recup id
+        isconnected,
+        // recherche user en fct de id 
+        extractUserInfo,
+        // afficher info user 
+        getUserInfo
+    );
 
 
 module.exports = router;
