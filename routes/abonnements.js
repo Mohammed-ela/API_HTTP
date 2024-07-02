@@ -2,38 +2,22 @@ const express = require('express');
 const {
     allAbonnement,
     getAbonnement,
-    subscription
+    subscription,
+    createCustomerPortalSession,
+    stripeWebhook
 } = require('../controllers/AbonnementsControllers.js');
 
 const router = express.Router();
 
-    // All abonnement
-    router.route('/')
-        .get(
-            allAbonnement
-        );
+// All abonnements
+router.route('/')
+    .get(allAbonnement);
 
-    router.route('/:id')
-        .get(
-            getAbonnement
-        )
-        //stripe
-        .post(
-            subscription
-        );
+router.route('/:id')
+    .get(getAbonnement)
+    .post(subscription);
 
+router.post('/create-customer-portal-session', createCustomerPortalSession);
+router.post('/webhook', express.raw({type: 'application/json'}), stripeWebhook);
 
-
-
-
-
-
-
-
-
-
-
-
-
-        
 module.exports = router;

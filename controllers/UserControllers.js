@@ -172,7 +172,7 @@ module.exports = {
                 }
             });
 
-            const recoveryLink = `http://127.0.0.1:5000/users/new-password/${slug}`;
+            const recoveryLink = `http://localhost:8100/users/new-password/${slug}`;
             
 
             const mailOptions = {
@@ -293,6 +293,34 @@ module.exports = {
         } catch (error) {
             res.status(500).json({ message: 'Erreur lors de lenvois information user =>  getUserInfo', error });
         }
+    },
+    // update
+    updateUserResponse: async (req, res) => {
+        try {
+            const { email, name } = req.body;
+            const userId = req.user.id;
+
+            // Vérifiez que l'email est valide
+            if (email && !mailPattern.test(email)) {
+                return res.status(400).json({ message: 'Format d\'e-mail invalide' });
+            }
+
+            // Préparez les données à mettre à jour
+            const updateData = {};
+            if (email) updateData.email = email;
+            if (name) updateData.name = name;
+
+            // Mettre à jour l'utilisateur
+            const updatedUser = await prisma.user.update({
+                where: { id: userId },
+                data: updateData,
+            });
+
+            res.status(200).json({ message: 'Informations mises à jour avec succès.', user: updatedUser });
+        } catch (error) {
+            console.error(new Date().toISOString(), 'controllers/UserControllers.js > updateUserResponse > error ', error);
+            res.status(500).json({ message: 'Erreur lors de la mise à jour des informations.', error });
+        }
     }
-    
+
 };

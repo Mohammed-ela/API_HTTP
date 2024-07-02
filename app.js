@@ -2,6 +2,7 @@
 const express = require("express");
 const port = process.env.PORT || 5000;
 const helmet = require("helmet");
+//desactiver les cors
 const cors = require("cors");
 
 

@@ -10,7 +10,8 @@ const {
     newPasswordResponse,
     isconnected,
     extractUserInfo,
-    getUserInfo
+    getUserInfo,
+    updateUserResponse
 
 } = require('../controllers/UserControllers.js');
 
@@ -42,8 +43,9 @@ router.route('/inscription')
   // ----------------------------------------------------------------Recovery Password
   router.route('/recovery-password/')
         .post(
-            //check email
+            //check email s'il existe en bdd
             checkEmailPayload,
+            // prend l'email et envois le link de reset a l'email
             recoveryResponse
         );
 // ----------------------- update password link
@@ -65,6 +67,15 @@ router.route('/inscription')
         // afficher info user 
         getUserInfo
     );
+//---------------------- update
+    router.route('/profile/update')
+    .put(
 
+        isconnected,
+        
+        extractUserInfo,
+      
+        updateUserResponse
+    );
 
 module.exports = router;
