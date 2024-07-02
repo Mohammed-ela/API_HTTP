@@ -295,32 +295,92 @@ module.exports = {
         }
     },
     // update
-    updateUserResponse: async (req, res) => {
-        try {
-            const { email, name } = req.body;
-            const userId = req.user.id;
+    // updateUserResponse dans UserControllers.js
+updateUserResponse: async (req, res) => {
+    try {
+        const { email, name } = req.body;
+        const userId = req.user.id;
 
-            // Vérifiez que l'email est valide
-            if (email && !mailPattern.test(email)) {
-                return res.status(400).json({ message: 'Format d\'e-mail invalide' });
-            }
+        // Vérifiez que l'email est valide
+        if (email && !mailPattern.test(email)) {
+            return res.status(400).json({ message: 'Format d\'e-mail invalide' });
+        }
 
-            // Préparez les données à mettre à jour
-            const updateData = {};
-            if (email) updateData.email = email;
-            if (name) updateData.name = name;
+        // Préparez les données à mettre à jour
+        const updateData = {};
+        if (email) updateData.email = email;
+        if (name) updateData.name = name;
 
-            // Mettre à jour l'utilisateur
-            const updatedUser = await prisma.user.update({
-                where: { id: userId },
-                data: updateData,
-            });
+        // Mettre à jour l'utilisateur
+        const updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: updateData,
+        });
 
-            res.status(200).json({ message: 'Informations mises à jour avec succès.', user: updatedUser });
-        } catch (error) {
+        res.status(200).json({ message: 'Informations mises à jour avec succès.', user: updatedUser });
+    } catch (error) {
+        if (error.code === 'P2002') {
+            res.status(409).json({ message: 'L\'e-mail est déjà utilisé par un autre compte.' });
+        } else {
             console.error(new Date().toISOString(), 'controllers/UserControllers.js > updateUserResponse > error ', error);
             res.status(500).json({ message: 'Erreur lors de la mise à jour des informations.', error });
         }
     }
+},
+
+    getUserSubscriptions: async (req, res) => {
+        try {
+            const userId = req.user.id;
+            const subscriptions = await prisma.stripeSubscription.findMany({
+                where: { userId: userId },
+            });
+            res.status(200).json(subscriptions);
+        } catch (error) {
+            console.error(new Date().toISOString(), 'controllers/UserControllers.js > getUserSubscriptions > error ', error);
+            res.status(500).json({ message: 'Erreur lors de la récupération des abonnements.', error });
+        }
+    },
+
+    deleteUser: async (req, res) => {
+        try {
+            const userId = req.user.id;
+    
+            // Récupérer les informations de l'utilisateur avant suppression
+            const user = await prisma.user.findUnique({
+                where: { id: userId },
+            });
+    
+            if (!user) {
+                return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+            }
+    
+            await prisma.user.delete({
+                where: { id: userId },
+            });
+    
+            // Envoyer un email de "au revoir"
+            const mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: user.email,
+                subject: 'Au revoir de notre plateforme',
+                text: `Bonjour ${user.name},\n\nNous sommes désolés de vous voir partir. Votre compte a été supprimé avec succès.\n\nCordialement,\nL'équipe`,
+            };
+    
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.error('Erreur lors de l\'envoi de l\'e-mail de "au revoir":', error);
+                } else {
+                    console.log('E-mail de "au revoir" envoyé:', info.response);
+                }
+            });
+    
+            res.status(200).json({ message: 'Compte supprimé avec succès.' });
+        } catch (error) {
+            console.error(new Date().toISOString(), 'controllers/UserControllers.js > deleteUser > error ', error);
+            res.status(500).json({ message: 'Erreur lors de la suppression du compte.', error });
+        }
+    },
+    
+
 
 };
