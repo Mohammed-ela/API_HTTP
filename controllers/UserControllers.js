@@ -343,43 +343,49 @@ updateUserResponse: async (req, res) => {
 
     deleteUser: async (req, res) => {
         try {
-            const userId = req.user.id;
+          const userId = req.user.id;
     
-            // Récupérer les informations de l'utilisateur avant suppression
-            const user = await prisma.user.findUnique({
-                where: { id: userId },
-            });
+          // Récupérer les informations de l'utilisateur avant suppression
+          const user = await prisma.user.findUnique({
+            where: { id: userId },
+          });
     
-            if (!user) {
-                return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+          if (!user) {
+            return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+          }
+    
+          // Supprimer les abonnements associés à l'utilisateur
+          await prisma.stripeSubscription.deleteMany({
+            where: { userId: userId },
+          });
+    
+          // Supprimer l'utilisateur
+          await prisma.user.delete({
+            where: { id: userId },
+          });
+    
+          // Envoyer un email de "au revoir"
+          const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: user.email,
+            subject: 'Au revoir de notre plateforme',
+            text: `Bonjour ${user.name},\n\nNous sommes désolés de vous voir partir. Votre compte et tous les abonnements associés ont été supprimés avec succès.\n\nCordialement,\nL'équipe`,
+          };
+    
+          transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+              console.error('Erreur lors de l\'envoi de l\'e-mail de "au revoir":', error);
+            } else {
+              console.log('E-mail de "au revoir" envoyé:', info.response);
             }
+          });
     
-            await prisma.user.delete({
-                where: { id: userId },
-            });
-    
-            // Envoyer un email de "au revoir"
-            const mailOptions = {
-                from: process.env.EMAIL_USER,
-                to: user.email,
-                subject: 'Au revoir de notre plateforme',
-                text: `Bonjour ${user.name},\n\nNous sommes désolés de vous voir partir. Votre compte a été supprimé avec succès.\n\nCordialement,\nL'équipe`,
-            };
-    
-            transporter.sendMail(mailOptions, (error, info) => {
-                if (error) {
-                    console.error('Erreur lors de l\'envoi de l\'e-mail de "au revoir":', error);
-                } else {
-                    console.log('E-mail de "au revoir" envoyé:', info.response);
-                }
-            });
-    
-            res.status(200).json({ message: 'Compte supprimé avec succès.' });
+          res.status(200).json({ message: 'Compte et abonnements supprimés avec succès.' });
         } catch (error) {
-            console.error(new Date().toISOString(), 'controllers/UserControllers.js > deleteUser > error ', error);
-            res.status(500).json({ message: 'Erreur lors de la suppression du compte.', error });
+          console.error(new Date().toISOString(), 'controllers/UserControllers.js > deleteUser > error ', error);
+          res.status(500).json({ message: 'Erreur lors de la suppression du compte.', error });
         }
-    },
+      },
     
 
 
