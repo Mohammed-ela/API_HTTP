@@ -16,7 +16,7 @@ const transporter = nodemailer.createTransport({
     port: process.env.SMTP_PORT,
     secure: process.env.SMTP_PORT == 465,
     auth: {
-        user: process.env.EMAIL_USER,
+        user: process.env.EMAIL_ADMIN,
         pass: process.env.EMAIL_PASS,
     },
     tls: {
@@ -107,7 +107,7 @@ module.exports = {
             
             // Envoie de l'email de bienvenue
             const mailOptions = {
-                from: process.env.EMAIL_USER,
+                from: process.env.EMAIL_ADMIN,
                 to: email,
                 subject: 'Bienvenue sur notre plateforme',
                 text: `Bonjour ${email},\n\nMerci de vous être inscrit sur notre plateforme.\n\nCordialement,\nL'équipe`,
@@ -172,11 +172,11 @@ module.exports = {
                 }
             });
 
-            const recoveryLink = `http://localhost:8100/users/new-password/${slug}`;
+            const recoveryLink = `http://localhost:8100/new-password/${slug}`;
             
 
             const mailOptions = {
-                from: process.env.EMAIL_USER,
+                from: process.env.EMAIL_ADMIN,
                 to: email,
                 subject: 'Récupération de mot de passe',
                 text: `Bonjour,\n\nCliquez sur le lien suivant pour réinitialiser votre mot de passe : ${recoveryLink}`,
@@ -244,7 +244,12 @@ module.exports = {
 
             await prisma.user.update({
                 where: { id: user.id },
-                data: { salt, hash }
+                data: { 
+                    salt, 
+                    hash,
+                    updatedAt: new Date() 
+                }
+                
             });
 
             await prisma.recoveryPassword.deleteMany({ where: { slug: recoveryEntry.slug } });
@@ -366,7 +371,7 @@ updateUserResponse: async (req, res) => {
     
           // Envoyer un email de "au revoir"
           const mailOptions = {
-            from: process.env.EMAIL_USER,
+            from: process.env.EMAIL_ADMIN,
             to: user.email,
             subject: 'Au revoir de notre plateforme',
             text: `Bonjour ${user.name},\n\nNous sommes désolés de vous voir partir. Votre compte et tous les abonnements associés ont été supprimés avec succès.\n\nCordialement,\nL'équipe`,
