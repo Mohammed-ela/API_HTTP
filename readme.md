@@ -1,157 +1,181 @@
 
-# Projet API HTTP
+# Momodev API
 
-Ce projet est une API simple pour gérer des abonnements, construite avec Node.js et Express. Les données des abonnements sont stockées dans une BDD MYSQL.
+Bienvenue dans l'API de Momodev, une solution SaaS pour gérer les actualités, les abonnements, les contacts et les utilisateurs. Ce guide vous fournira toutes les informations nécessaires pour configurer et utiliser l'API.
 
-## Structure du Projet
+## Table des matières
 
-```
-project-root/
-├── app.js
-├── controllers/
-│   └── abonnementsController.js
-├── models/
-│   └── abonnement.js
-├── routes/
-│   └── abonnements.js
-└── data/
-    └── abonnements.json
-
-```
-
-## Prérequis
-
-- Node.js 
-- npm 
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Démarrage](#démarrage)
+- [Endpoints](#endpoints)
+  - [Utilisateurs](#utilisateurs)
+  - [Actualités](#actualités)
+  - [Abonnements](#abonnements)
+  - [Contacts](#contacts)
+- [Exemples de requêtes](#exemples-de-requêtes)
+- [Technologies utilisées](#technologies-utilisées)
 
 ## Installation
 
-1. Clonez le dépôt :
-   ```bash
-   git clone https://github.com/Mohammed-ela/API_HTTP
-   ```
+Clonez le dépôt depuis GitHub :
 
-2. Naviguez dans le répertoire du projet :
-   ```bash
-   cd back_end
-   ```
+\`\`\`bash
+git clone https://github.com/votre-utilisateur/momodev-api.git
+cd momodev-api
+\`\`\`
 
-3. Installez les dépendances :
-   ```bash
-   npm install
-   ```
+Installez les dépendances nécessaires :
 
-## Démarrer le Serveur
+\`\`\`bash
+npm install
+\`\`\`
 
-Pour démarrer le serveur, exécutez la commande suivante :
-```bash
+## Configuration
+
+Copiez le fichier `.env.example` en `.env` et modifiez les valeurs en fonction de votre configuration :
+
+\`\`\`bash
+cp .env.example .env
+\`\`\`
+
+Voici un exemple de ce que pourrait contenir votre fichier `.env` :
+
+\`\`\`
+PORT=3000
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=youruser
+DB_PASS=yourpassword
+DB_NAME=yourdatabase
+SMTP_HOST=smtp.mailtrap.io
+SMTP_PORT=2525
+EMAIL_ADMIN=admin@example.com
+EMAIL_PASS=secret
+\`\`\`
+
+## Démarrage
+
+Pour démarrer l'application, utilisez la commande suivante :
+
+\`\`\`bash
 npm start
-```
+\`\`\`
 
-Le serveur devrait maintenant être en ligne sur `http://localhost:5000`.
+Votre API sera accessible à l'adresse \`http://localhost:3000\`.
 
-## Routes Disponibles
+## Endpoints
 
-### Obtenir tous les abonnements
+### Utilisateurs
 
-- **URL** : `/abonnements`
-- **Méthode** : `GET`
-- **Description** : Retourne la liste de tous les abonnements.
-- **Exemple de réponse** :
-  ```json
-  [
-      {
-          "id": 1,
-          "name": "",
-          "price": ,
-          "duration": "",
-          "description": "",
-          "features": [
-              "A",
-              "B",
-              "C"
-          ],
-          "communityAccess": {
-              "Discord": true,
-              "Facebook": true
-          }
-      },
-      {
-          "id": 2,
-          "name": "",
-          "price": ,
-          "duration": "",
-          "description": "",
-          "features": [
-              "A",
-              "B",
-              "C",
-              "D"
-          ],
-          "communityAccess": {
-              "Discord": true,
-              "Facebook": true
-          }
-      }
-  ]
-  ```
-
-### Obtenir un abonnement par ID
-
-- **URL** : `/abonnements/:id`
-- **Méthode** : `GET`
-- **Description** : Retourne les détails d'un abonnement spécifique par son ID.
-- **Exemple de réponse** :
-  ```json
+- **Créer un utilisateur**
+  - **POST** `/users/register`
+  - Corps de la requête :
+    \`\`\`json
     {
-          "id": 1,
-          "name": "",
-          "price": ,
-          "duration": "",
-          "description": "",
-          "features": [
-              "A",
-              "B",
-              "C"
-          ],
-          "communityAccess": {
-              "Discord": true,
-              "Facebook": true
-          }
+      "name": "Nom",
+      "email": "email@example.com",
+      "password": "motdepasse"
     }
-  ```
+    \`\`\`
 
-### Gestion des users
+- **Connexion d'un utilisateur**
+  - **POST** `/users/login`
+  - Corps de la requête :
+    \`\`\`json
+    {
+      "email": "email@example.com",
+      "password": "motdepasse"
+    }
+    \`\`\`
 
-- **URL** : `/users`
-- **Méthode** : `POST`
-- **Description** :
-- **Exemple de réponse** :
-  EN COURS
+### Actualités
 
+- **Récupérer toutes les actualités**
+  - **GET** `/actualites`
+  
+- **Récupérer une actualité par ID**
+  - **GET** `/actualites/:id`
+  
+- **Créer une actualité**
+  - **POST** `/actualites`
+  - Corps de la requête :
+    \`\`\`json
+    {
+      "title": "Titre de l'actualité",
+      "description": "Description de l'actualité",
+      "image": "URL de l'image",
+      "userOrAdmin": 1
+    }
+    \`\`\`
 
-### Page static GET (cgu cgv etc)
+### Abonnements
 
-- **URL** : `/actualite`
-- **Méthode** : `GET`
-- **Description** :
-- **Exemple de réponse** :
-  EN COURS
+- **Récupérer tous les abonnements**
+  - **GET** `/abonnements`
+  
+- **Récupérer un abonnement par ID**
+  - **GET** `/abonnements/:id`
+  
+- **Créer un abonnement**
+  - **POST** `/abonnements`
+  - Corps de la requête :
+    \`\`\`json
+    {
+      "userId": 1,
+      "plan": "Plan de l'abonnement",
+      "status": "active"
+    }
+    \`\`\`
 
-## Fichiers Importants
+### Contacts
 
-### `app.js`
+- **Envoyer un message de contact**
+  - **POST** `/contact`
+  - Corps de la requête :
+    \`\`\`json
+    {
+      "name": "Nom",
+      "email": "email@example.com",
+      "subject": "Objet du message",
+      "message": "Votre message"
+    }
+    \`\`\`
 
-Le point d'entrée de l'application. Il configure le serveur Express et définit les routes principales.
+## Exemples de requêtes
 
-### `routes/abonnements.js`
+### Créer un utilisateur
 
-Contient les routes pour gérer les abonnements. Lit les données depuis le fichier JSON et les retourne en réponse aux requêtes.
+\`\`\`bash
+curl -X POST http://localhost:3000/users/register -H "Content-Type: application/json" -d '{
+  "name": "Nom",
+  "email": "email@example.com",
+  "password": "motdepasse"
+}'
+\`\`\`
 
-### `data/abonnements.json`
+### Connexion d'un utilisateur
 
-Contient les données des abonnements en format JSON.
+\`\`\`bash
+curl -X POST http://localhost:3000/users/login -H "Content-Type: application/json" -d '{
+  "email": "email@example.com",
+  "password": "motdepasse"
+}'
+\`\`\`
 
-## Licence
+### Récupérer toutes les actualités
 
-Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+\`\`\`bash
+curl -X GET http://localhost:3000/actualites
+\`\`\`
+
+## Technologies utilisées
+
+- Node.js
+- Express
+- Prisma
+- PostgreSQL
+- Nodemailer
+- Vuelidate (pour la validation côté client)
+- Vue.js (pour le frontend)
+
