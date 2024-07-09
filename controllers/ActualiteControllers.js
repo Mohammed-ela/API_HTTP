@@ -5,6 +5,7 @@ module.exports = {
     getAllActualites: async (req, res) => {
         try {
             const actualites = await prisma.actualite.findMany();
+            console.log('Actualités renvoyées:', actualites); // Log du contenu renvoyé
             res.status(200).json(actualites);
         } catch (error) {
             console.error('Erreur lors de la récupération des actualités:', error);
@@ -19,6 +20,7 @@ module.exports = {
                 where: { id: parseInt(id) }
             });
             if (actualite) {
+                // console.log('Actualité renvoyée:', actualite); 
                 res.status(200).json(actualite);
             } else {
                 res.status(404).json({ message: "Actualité non trouvée" });
