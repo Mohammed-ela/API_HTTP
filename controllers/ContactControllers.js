@@ -9,7 +9,7 @@ const transporter = nodemailer.createTransport({
     port: process.env.SMTP_PORT,
     secure: process.env.SMTP_PORT == 465,
     auth: {
-        user: process.env.EMAIL_USER,
+        user: process.env.EMAIL_ADMIN,
         pass: process.env.EMAIL_PASS,
     },
     tls: {
@@ -36,21 +36,41 @@ module.exports = {
                 }
             });
 
-            // Envoyer l'e-mail
-            const mailOptions = {
+            // Envoyer l'e-mail à l'admin
+            const mailOptionsAdmin = {
                 from: email,
-                to: process.env.EMAIL_USER,
+                to: process.env.EMAIL_ADMIN,
                 subject: `Contact Form: ${subject}`,
                 text: `Nom: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
             };
 
-            transporter.sendMail(mailOptions, (error, info) => {
+            // Envoyer l'e-mail de confirmation à l'utilisateur
+            const mailOptionsUser = {
+                from: process.env.EMAIL_ADMIN,
+                to: email,
+                subject: `Votre message a bien été envoyé`,
+                text: `Bonjour ${name},\n\nVotre message a bien été envoyé à notre service MomoDev.\n\nVotre message :\n${message}\n\nMerci de nous avoir contactés.`,
+            };
+
+            // Envoyer l'e-mail à l'admin
+            transporter.sendMail(mailOptionsAdmin, (error, info) => {
                 if (error) {
-                    console.error('Erreur lors de l\'envoi de l\'e-mail:', error);
-                    return res.status(500).json({ message: 'Erreur lors de l\'envoi de l\'e-mail.', error });
+                    console.error('Erreur lors de l\'envoi de l\'e-mail à l\'admin:', error);
+                    return res.status(500).json({ message: 'Erreur lors de l\'envoi de l\'e-mail à l\'admin.', error });
                 }
-                res.status(200).json({ message: 'E-mail envoyé avec succès.', contact: newContact });
+                console.log('E-mail envoyé à l\'admin:', info.response);
             });
+
+            // Envoyer l'e-mail de confirmation à l'utilisateur
+            transporter.sendMail(mailOptionsUser, (error, info) => {
+                if (error) {
+                    console.error('Erreur lors de l\'envoi de l\'e-mail de confirmation à l\'utilisateur:', error);
+                    return res.status(500).json({ message: 'Erreur lors de l\'envoi de l\'e-mail de confirmation à l\'utilisateur.', error });
+                }
+                console.log('E-mail de confirmation envoyé à l\'utilisateur:', info.response);
+            });
+
+            res.status(200).json({ message: 'E-mails envoyés avec succès.', contact: newContact });
         } catch (error) {
             console.error('Erreur lors de l\'enregistrement du contact:', error);
             res.status(500).json({ message: 'Erreur lors de l\'enregistrement du contact.', error });
