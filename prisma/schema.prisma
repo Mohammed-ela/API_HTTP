@@ -1,0 +1,88 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                Int                 @id @default(autoincrement())
+  email             String              @unique
+  name              String
+  salt              String
+  hash              String
+  status            Int                 @default(1) // 1 pour user, 2 pour admin
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  stripeSubscriptions StripeSubscription[]
+  promoCodes           PromoCode[]
+}
+
+model RecoveryPassword {
+  id        Int      @id @default(autoincrement())
+  slug      String   @unique
+  userId    Int
+  expireAt  DateTime @default(now())
+}
+
+model Abonnement {
+  id              Int      @id @default(autoincrement())
+  name            String
+  price           Float
+  duration        String
+  description     String
+  features        Json
+  communityAccess Json
+  image           String?  // Nouvelle colonne image, nullable
+}
+
+
+model Actualite {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  title       String
+  description String
+  image       String
+  actif       Boolean  @default(true) // true pour actu actif, false pour actu inactif
+  userOrAdmin Int      @default(1) // 1 si c pour user, 2 si c pour admin
+}
+
+model Contact {
+  id          Int      @id @default(autoincrement())
+  name        String
+  email       String
+  subject     String
+  message     String
+  createdAt   DateTime @default(now())
+}
+
+model StripeSubscription {
+  id                   Int      @id @default(autoincrement())
+  userId               Int
+  abonnementId         Int
+  stripeCustomerId     String
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  status               String
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  user                 User     @relation(fields: [userId], references: [id])
+}
+
+
+
+model PromoCode {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique
+  discount    Float
+  isActive    Boolean  @default(true)
+  userId      Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id])
+}
